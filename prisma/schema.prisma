@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model LeadCategory {
+  id        String   @id @default(cuid())
+  name      String
+  site      String
+  niche     String
+  createdAt DateTime @default(now())
+  leads     Lead[]
+}
+
+model Lead {
+  id           String        @id @default(cuid())
+  name         String
+  profileLink  String
+  businessName String
+  email        String
+  sourceSite   String
+  niche        String
+  categoryId   String?
+  category     LeadCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdAt    DateTime      @default(now())
+
+  @@index([categoryId])
+  @@index([email])
+}

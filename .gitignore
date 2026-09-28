@@ -1,0 +1,8 @@
+node_modules
+.next
+.env
+*.db
+*.db-journal
+prisma/dev.db
+.puppeteer-profile/
+debug-google.png
