@@ -1,22 +1,15 @@
 import { NextRequest } from "next/server";
-import { z } from "zod";
 import { runLeadSearchPipeline } from "@/lib/lead-pipeline";
+import { searchBodySchema } from "@/lib/search-body-schema";
 import { siteDomainById, SOCIAL_SITES } from "@/lib/search-query";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 600;
 
-const bodySchema = z.object({
-  siteId: z.string(),
-  niche: z.string().min(1).max(120),
-  categoryName: z.string().min(1).max(120).optional(),
-  maxPages: z.number().int().min(1).max(10).optional(),
-});
-
 export async function POST(req: NextRequest) {
   const json = await req.json();
-  const parsed = bodySchema.safeParse(json);
+  const parsed = searchBodySchema.safeParse(json);
   if (!parsed.success) {
     return new Response(JSON.stringify({ type: "error", message: "Invalid request" }), {
       status: 400,
@@ -24,7 +17,14 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const { siteId, niche, categoryName, maxPages = 5 } = parsed.data;
+  const {
+    siteId,
+    niche,
+    categoryName,
+    regions,
+    startPage,
+    endPage,
+  } = parsed.data;
   const domain = siteDomainById(siteId);
   if (!domain) {
     return new Response(JSON.stringify({ type: "error", message: "Unknown site" }), {
@@ -35,9 +35,11 @@ export async function POST(req: NextRequest) {
 
   const siteLabel =
     SOCIAL_SITES.find((s) => s.id === siteId)?.label ?? domain;
+  const regionLabel =
+    regions.length > 0 ? ` · ${regions.slice(0, 2).join(", ")}${regions.length > 2 ? "…" : ""}` : "";
   const name =
     categoryName?.trim() ||
-    `${siteLabel} — ${niche.trim()}`.slice(0, 120);
+    `${siteLabel} — ${niche.trim()}${regionLabel}`.slice(0, 120);
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
@@ -53,7 +55,9 @@ export async function POST(req: NextRequest) {
             niche,
             domain,
             categoryName: name,
-            maxPages,
+            regions,
+            startPage,
+            endPage,
           },
           send
         );

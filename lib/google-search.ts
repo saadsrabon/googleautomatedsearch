@@ -75,9 +75,13 @@ export async function fetchGoogleResults(
   }
 
   const all: SerpItem[] = [];
-  await runGoogleSearchPagination(query, maxPages, async (items) => {
-    all.push(...items);
-  });
+  await runGoogleSearchPagination(
+    query,
+    { startPage: 1, endPage: maxPages },
+    async (items) => {
+      all.push(...items);
+    }
+  );
   return all;
 }
 

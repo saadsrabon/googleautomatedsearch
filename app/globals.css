@@ -2,6 +2,144 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --background: 222 47% 4%;
+  --neon-cyan: 187 92% 53%;
+  --neon-fuchsia: 292 91% 73%;
+}
+
 body {
-  @apply bg-slate-50 text-ink antialiased;
+  @apply bg-neon-void text-slate-100 antialiased;
+}
+
+.font-cyber-display {
+  font-family: var(--font-cyber-display), system-ui, sans-serif;
+}
+
+.font-cyber-mono {
+  font-family: var(--font-cyber-mono), ui-monospace, monospace;
+}
+
+.cyber-shell {
+  background: radial-gradient(ellipse 120% 80% at 0% 0%, rgba(34, 211, 238, 0.08), transparent 50%),
+    radial-gradient(ellipse 80% 60% at 100% 100%, rgba(232, 121, 249, 0.06), transparent 45%),
+    #070b14;
+}
+
+.cyber-sidebar {
+  background: linear-gradient(180deg, rgba(8, 12, 22, 0.98) 0%, rgba(5, 8, 16, 0.99) 100%);
+  box-shadow: 4px 0 32px rgba(0, 0, 0, 0.45);
+}
+
+.cyber-sidebar-grid {
+  background-image: linear-gradient(rgba(34, 211, 238, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+}
+
+.cyber-main-grid {
+  background-image: linear-gradient(rgba(34, 211, 238, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.cyber-logo-ring {
+  animation: cyber-logo-pulse 3s ease-in-out infinite;
+}
+
+@keyframes cyber-logo-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 16px rgba(34, 211, 238, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(232, 121, 249, 0.25);
+  }
+}
+
+.cyber-nav-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 0.5rem;
+  opacity: 0;
+  background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.06), transparent);
+  transition: opacity 0.25s;
+  pointer-events: none;
+}
+
+.cyber-nav-link:hover::after {
+  opacity: 1;
+}
+
+@keyframes pipeline-shimmer {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+@keyframes pipeline-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.9;
+  }
+}
+
+@keyframes log-progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(350%);
+  }
+}
+
+@keyframes chat-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+.pipeline-shimmer {
+  animation: pipeline-shimmer 2.2s ease-in-out infinite;
+}
+
+.pipeline-pulse {
+  animation: pipeline-pulse 1.6s ease-in-out infinite;
+}
+
+.pipeline-pulse-delay {
+  animation-delay: 0.35s;
+}
+
+.log-progress {
+  animation: log-progress 1.4s ease-in-out infinite;
+}
+
+.chat-dot {
+  animation: chat-dot 1.2s ease-in-out infinite;
+}
+
+.chat-dot-2 {
+  animation-delay: 0.15s;
+}
+
+.chat-dot-3 {
+  animation-delay: 0.3s;
 }

@@ -41,17 +41,26 @@ async function handleBlockedPage(
   );
 }
 
+export type PageRange = { startPage: number; endPage: number };
+
 export type PageHandler = (
   items: SerpItem[],
-  ctx: { pageIndex: number; maxPages: number }
+  ctx: {
+    pageNumber: number;
+    startPage: number;
+    endPage: number;
+  }
 ) => Promise<void | "stop">;
 
-/** One browser session: paginate Google and invoke handler per results page. */
+/** One browser session: paginate Google pages [startPage..endPage] (1-based). */
 export async function runGoogleSearchPagination(
   query: string,
-  maxPages: number,
+  range: PageRange,
   onPage: PageHandler
 ): Promise<{ totalItems: number; pagesVisited: number }> {
+  const startPage = Math.max(1, range.startPage);
+  const endPage = Math.max(startPage, range.endPage);
+  const pageCount = endPage - startPage + 1;
   return withBrowserProfileLock(async () => {
     const forceVisible = process.env.PUPPETEER_HEADLESS === "false";
     const browser = await getSearchBrowser(forceVisible);
@@ -63,16 +72,17 @@ export async function runGoogleSearchPagination(
     try {
       await prepareGooglePage(page);
 
-      for (let pageIndex = 0; pageIndex < maxPages; pageIndex++) {
-        const start = pageIndex * 10;
-        const url = googleSearchUrl(query, start);
+      for (let i = 0; i < pageCount; i++) {
+        const pageNumber = startPage + i;
+        const googleOffset = (pageNumber - 1) * 10;
+        const url = googleSearchUrl(query, googleOffset);
 
         await page.goto(url, {
           waitUntil: "networkidle2",
           timeout: 120_000,
         });
 
-        if (pageIndex === 0) {
+        if (i === 0) {
           await dismissGoogleConsent(page);
         }
 
@@ -83,7 +93,7 @@ export async function runGoogleSearchPagination(
         let batch = await scrapeResultsPage(page);
         if (
           batch.length === 0 &&
-          pageIndex === 0 &&
+          i === 0 &&
           (await isGoogleBlocked(page))
         ) {
           await handleBlockedPage(page, forceVisible);
@@ -107,19 +117,12 @@ export async function runGoogleSearchPagination(
         pagesVisited += 1;
         totalItems += unique.length;
 
-        const stop = await onPage(unique, { pageIndex, maxPages });
+        const stop = await onPage(unique, {
+          pageNumber,
+          startPage,
+          endPage,
+        });
         if (stop === "stop") break;
-
-        const hasNext = await page.$("#pnnext");
-        if (!hasNext || pageIndex >= maxPages - 1) break;
-
-        await Promise.all([
-          page.waitForNavigation({
-            waitUntil: "domcontentloaded",
-            timeout: 60_000,
-          }),
-          hasNext.click(),
-        ]).catch(() => {});
       }
 
       return { totalItems, pagesVisited };

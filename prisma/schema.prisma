@@ -11,6 +11,7 @@ model LeadCategory {
   name      String
   site      String
   niche     String
+  regions   String?
   createdAt DateTime @default(now())
   leads     Lead[]
 }

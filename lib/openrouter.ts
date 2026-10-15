@@ -61,7 +61,7 @@ function normalizeLead(item: SerpItem, lead: ExtractedLead): ExtractedLead {
   };
 }
 
-async function callOpenRouter(
+export async function callOpenRouter(
   system: string,
   user: string
 ): Promise<string> {

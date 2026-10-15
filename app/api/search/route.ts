@@ -1,29 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
 import { runLeadSearchPipeline } from "@/lib/lead-pipeline";
+import { searchBodySchema } from "@/lib/search-body-schema";
 import { siteDomainById, SOCIAL_SITES } from "@/lib/search-query";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 600;
 
-const bodySchema = z.object({
-  siteId: z.string(),
-  niche: z.string().min(1).max(120),
-  categoryName: z.string().min(1).max(120).optional(),
-  maxPages: z.number().int().min(1).max(10).optional(),
-});
-
-/** Non-streaming fallback — same automated paginate + per-item AI pipeline. */
 export async function POST(req: NextRequest) {
   try {
     const json = await req.json();
-    const parsed = bodySchema.safeParse(json);
+    const parsed = searchBodySchema.safeParse(json);
     if (!parsed.success) {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 });
     }
 
-    const { siteId, niche, categoryName, maxPages = 5 } = parsed.data;
+    const {
+      siteId,
+      niche,
+      categoryName,
+      regions,
+      startPage,
+      endPage,
+    } = parsed.data;
     const domain = siteDomainById(siteId);
     if (!domain) {
       return NextResponse.json({ error: "Unknown site" }, { status: 400 });
@@ -45,7 +44,15 @@ export async function POST(req: NextRequest) {
     };
 
     await runLeadSearchPipeline(
-      { siteId, niche, domain, categoryName: name, maxPages },
+      {
+        siteId,
+        niche,
+        domain,
+        categoryName: name,
+        regions,
+        startPage,
+        endPage,
+      },
       (event) => {
         if (event.type === "done") {
           outcome.query = event.query;

@@ -10,8 +10,20 @@ import {
 import { buildGoogleQuery } from "./search-query";
 
 export type PipelineEvent =
-  | { type: "started"; query: string; categoryId: string; maxPages: number }
-  | { type: "page_start"; page: number; maxPages: number; itemCount: number }
+  | {
+      type: "started";
+      query: string;
+      categoryId: string;
+      startPage: number;
+      endPage: number;
+    }
+  | {
+      type: "page_start";
+      page: number;
+      startPage: number;
+      endPage: number;
+      itemCount: number;
+    }
   | { type: "item_start"; page: number; index: number; title: string }
   | { type: "item_ai"; page: number; index: number; status: "formatting" | "saved" | "skipped" }
   | { type: "item_saved"; page: number; index: number; email: string; name: string }
@@ -32,7 +44,9 @@ export type PipelineInput = {
   niche: string;
   domain: string;
   categoryName: string;
-  maxPages: number;
+  regions: string[];
+  startPage: number;
+  endPage: number;
 };
 
 function sleep(ms: number) {
@@ -55,8 +69,8 @@ export async function runLeadSearchPipeline(
   input: PipelineInput,
   emit: (event: PipelineEvent) => void
 ): Promise<void> {
-  const { niche, domain, categoryName, maxPages } = input;
-  const query = buildGoogleQuery(domain, niche.trim());
+  const { niche, domain, categoryName, regions, startPage, endPage } = input;
+  const query = buildGoogleQuery(domain, niche.trim(), regions);
 
   await ensureDbConnection();
 
@@ -65,6 +79,7 @@ export async function runLeadSearchPipeline(
       name: categoryName,
       site: domain,
       niche: niche.trim(),
+      regions: regions.length > 0 ? regions.join(", ") : null,
     },
   });
 
@@ -72,7 +87,8 @@ export async function runLeadSearchPipeline(
     type: "started",
     query,
     categoryId: category.id,
-    maxPages,
+    startPage,
+    endPage,
   });
 
   const savedEmails = new Set<string>();
@@ -87,12 +103,13 @@ export async function runLeadSearchPipeline(
   try {
     const { totalItems, pagesVisited } = await runGoogleSearchPagination(
       query,
-      maxPages,
-      async (items, { pageIndex, maxPages: maxP }) => {
+      { startPage, endPage },
+      async (items, ctx) => {
         emit({
           type: "page_start",
-          page: pageIndex + 1,
-          maxPages: maxP,
+          page: ctx.pageNumber,
+          startPage: ctx.startPage,
+          endPage: ctx.endPage,
           itemCount: items.length,
         });
 
@@ -104,14 +121,14 @@ export async function runLeadSearchPipeline(
 
           emit({
             type: "item_start",
-            page: pageIndex + 1,
+            page: ctx.pageNumber,
             index: i + 1,
             title: item.title || item.link,
           });
 
           emit({
             type: "item_ai",
-            page: pageIndex + 1,
+            page: ctx.pageNumber,
             index: i + 1,
             status: "formatting",
           });
@@ -122,7 +139,7 @@ export async function runLeadSearchPipeline(
           } catch (e) {
             emit({
               type: "item_skipped",
-              page: pageIndex + 1,
+              page: ctx.pageNumber,
               index: i + 1,
               reason:
                 e instanceof Error ? e.message : "AI formatting failed",
@@ -134,7 +151,7 @@ export async function runLeadSearchPipeline(
           if (!lead) {
             emit({
               type: "item_skipped",
-              page: pageIndex + 1,
+              page: ctx.pageNumber,
               index: i + 1,
               reason: "No email after scrape + AI format",
             });
@@ -146,7 +163,7 @@ export async function runLeadSearchPipeline(
           if (savedEmails.has(emailKey)) {
             emit({
               type: "item_skipped",
-              page: pageIndex + 1,
+              page: ctx.pageNumber,
               index: i + 1,
               reason: "Duplicate email",
             });
@@ -172,14 +189,14 @@ export async function runLeadSearchPipeline(
 
           emit({
             type: "item_ai",
-            page: pageIndex + 1,
+            page: ctx.pageNumber,
             index: i + 1,
             status: "saved",
           });
 
           emit({
             type: "item_saved",
-            page: pageIndex + 1,
+            page: ctx.pageNumber,
             index: i + 1,
             email: lead.email,
             name: lead.name,
@@ -190,7 +207,7 @@ export async function runLeadSearchPipeline(
 
         emit({
           type: "page_done",
-          page: pageIndex + 1,
+          page: ctx.pageNumber,
           processed: items.length,
           saved: savedOnPage,
         });
