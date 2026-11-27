@@ -110,6 +110,7 @@ export function SearchChatbot({
         content: "Starting automation now — watch the log on the right.",
       });
 
+      onParsingChange?.(false);
       await onAutoStart(params);
     } catch (err) {
       appendMessage({
