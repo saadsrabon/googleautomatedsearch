@@ -133,11 +133,11 @@ export function SearchChatbot({
     <SpotlightCard
       title="Search assistant"
       subtitle="Natural language → auto pipeline"
-      className="border-violet-200/60 bg-violet-50/20"
+      variant="cyber"
     >
       <ul
         ref={listRef}
-        className="mb-4 max-h-[280px] space-y-3 overflow-y-auto pr-1 text-sm"
+        className="mb-4 max-h-[280px] space-y-3 overflow-y-auto pr-1 text-sm text-slate-200"
       >
         {messages.map((m) => (
           <li
@@ -145,27 +145,27 @@ export function SearchChatbot({
             className={
               m.role === "user"
                 ? "ml-8 rounded-2xl rounded-tr-md bg-slate-900 px-4 py-2.5 text-slate-100"
-                : "mr-8 rounded-2xl rounded-tl-md border border-slate-200/80 bg-white px-4 py-2.5 text-slate-800 shadow-sm"
+                : "mr-8 rounded-2xl rounded-tl-md border border-white/10 bg-[#101e2c] px-4 py-2.5 text-slate-200 shadow-sm"
             }
           >
             <p>{m.content}</p>
             {m.params && (
               <div className="mt-2 flex flex-wrap gap-1.5">
-                <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[11px] font-medium text-violet-800">
+                <span className="rounded-full border border-fuchsia-400/20 bg-fuchsia-400/10 px-2 py-0.5 text-[11px] font-medium text-fuchsia-200">
                   {siteLabel(m.params.siteId)}
                 </span>
-                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-700">
+                <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] text-slate-300">
                   {m.params.niche}
                 </span>
                 {m.params.regions.slice(0, 3).map((r) => (
                   <span
                     key={r}
-                    className="rounded-full bg-cyan-50 px-2 py-0.5 text-[11px] text-cyan-900"
+                    className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2 py-0.5 text-[11px] text-cyan-100"
                   >
                     {r}
                   </span>
                 ))}
-                <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] text-amber-900">
+                <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-2 py-0.5 text-[11px] text-amber-100">
                   p.{m.params.startPage}–{m.params.endPage}
                 </span>
               </div>
@@ -191,7 +191,7 @@ export function SearchChatbot({
             type="button"
             disabled={disabled || parsing}
             onClick={() => setInput(ex)}
-            className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-600 hover:border-violet-300 hover:text-violet-700 disabled:opacity-50"
+            className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-slate-400 hover:border-cyan-400/40 hover:text-cyan-100 disabled:opacity-50"
           >
             {ex}
           </button>
@@ -204,12 +204,12 @@ export function SearchChatbot({
           onChange={(e) => setInput(e.target.value)}
           placeholder="e.g. Instagram photographer UK, pages 1–5"
           disabled={disabled || parsing}
-          className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none ring-violet-500/30 focus:ring-2"
+          className="min-w-0 flex-1 rounded-xl border border-white/10 bg-[#07111c] px-3 py-2.5 text-sm text-slate-100 outline-none placeholder:text-slate-600 focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/20"
         />
         <button
           type="submit"
           disabled={disabled || parsing || !input.trim()}
-          className="shrink-0 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-700 disabled:opacity-50"
+          className="shrink-0 rounded-xl bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-[#07111c] hover:bg-cyan-300 disabled:opacity-50"
         >
           {parsing ? "…" : "Go"}
         </button>

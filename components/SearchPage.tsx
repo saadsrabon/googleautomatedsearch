@@ -94,10 +94,10 @@ export function SearchPage() {
 
   const visualPhase: PipelineVisualPhase = chatParsing
     ? "parsing"
-    : verifyLoading
-      ? "verifying"
-      : loading
-        ? "running"
+    : loading
+      ? "running"
+      : verifyLoading
+        ? "verifying"
         : "idle";
 
   async function resetBrowser() {
@@ -132,14 +132,13 @@ export function SearchPage() {
   const busy = loading || verifyLoading || chatParsing;
 
   return (
-    <div className="mx-auto w-full max-w-[1600px] space-y-6">
+    <div className="mx-auto w-full max-w-[1600px] space-y-6 text-slate-100">
       <PageHeader
         eyebrow="Automation"
         title="Search pipeline"
         description="Describe a search in plain English or use the form — scrape, AI format, save to Neon."
+        variant="cyber"
       />
-
-      <PipelineStatusAnimation phase={visualPhase} />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(320px,420px)_1fr]">
         <div className="space-y-4">
@@ -153,9 +152,10 @@ export function SearchPage() {
           <SpotlightCard
             title="Step 1 — Verify Google"
             subtitle="CAPTCHA once, then automated pagination"
-            className="border-amber-200/80 bg-amber-50/30"
+            variant="cyber"
+            className="border-amber-400/20 bg-amber-500/[0.04]"
           >
-            <label className="mb-3 flex items-center gap-2 text-sm text-slate-700">
+            <label className="mb-3 flex items-center gap-2 text-sm text-slate-300">
               <input
                 type="checkbox"
                 checked={autoAfterVerify}
@@ -176,17 +176,17 @@ export function SearchPage() {
                 type="button"
                 onClick={resetBrowser}
                 disabled={busy}
-                className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-medium text-slate-700"
+                className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2 text-xs font-medium text-slate-300"
               >
                 Close stuck Chrome
               </button>
             </div>
             {verifyStatus && (
-              <p className="mt-3 text-sm text-amber-900">{verifyStatus}</p>
+              <p className="mt-3 text-sm text-amber-200">{verifyStatus}</p>
             )}
           </SpotlightCard>
 
-          <SpotlightCard title="Step 2 — Search settings">
+          <SpotlightCard title="Step 2 — Search settings" variant="cyber">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -195,13 +195,13 @@ export function SearchPage() {
               className="space-y-3"
             >
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-600">
+                <label className="mb-1 block text-xs font-medium text-slate-400">
                   Social site
                 </label>
                 <select
                   value={siteId}
                   onChange={(e) => setSiteId(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-xl border border-white/10 bg-[#07111c] px-3 py-2 text-sm text-slate-100 outline-none focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/15"
                 >
                   {SOCIAL_SITES.map((s) => (
                     <option key={s.id} value={s.id}>
@@ -212,7 +212,7 @@ export function SearchPage() {
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-600">
+                <label className="mb-1 block text-xs font-medium text-slate-400">
                   Niche / keyword
                 </label>
                 <input
@@ -220,18 +220,18 @@ export function SearchPage() {
                   onChange={(e) => setNiche(e.target.value)}
                   placeholder="e.g. Photographer"
                   required
-                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-xl border border-white/10 bg-[#07111c] px-3 py-2 text-sm text-slate-100 outline-none focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/15"
                 />
               </div>
 
               <div>
                 <div className="mb-1 flex items-center justify-between">
-                  <label className="text-xs font-medium text-slate-600">
+                  <label className="text-xs font-medium text-slate-400">
                     Countries / cities
                   </label>
                   <button
                     type="button"
-                    className="text-xs text-violet-600 hover:underline"
+                    className="text-xs text-cyan-300 hover:text-cyan-200 hover:underline"
                     onClick={() => setRegionsText(DEFAULT_EU_REGIONS.join(", "))}
                   >
                     Load EU list
@@ -241,7 +241,7 @@ export function SearchPage() {
                   value={regionsText}
                   onChange={(e) => setRegionsText(e.target.value)}
                   rows={4}
-                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs leading-relaxed"
+                  className="w-full rounded-xl border border-white/10 bg-[#07111c] px-3 py-2 text-xs leading-relaxed text-slate-100 outline-none focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/15"
                 />
                 <p className="mt-1 text-[11px] text-slate-500">
                   {regions.length} location(s) in query
@@ -250,7 +250,7 @@ export function SearchPage() {
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-600">
+                  <label className="mb-1 block text-xs font-medium text-slate-400">
                     Start page
                   </label>
                   <input
@@ -259,11 +259,11 @@ export function SearchPage() {
                     max={50}
                     value={startPage}
                     onChange={(e) => setStartPage(Number(e.target.value) || 1)}
-                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                    className="w-full rounded-xl border border-white/10 bg-[#07111c] px-3 py-2 text-sm text-slate-100 outline-none focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/15"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-600">
+                  <label className="mb-1 block text-xs font-medium text-slate-400">
                     End page
                   </label>
                   <input
@@ -272,19 +272,19 @@ export function SearchPage() {
                     max={50}
                     value={endPage}
                     onChange={(e) => setEndPage(Number(e.target.value) || 1)}
-                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                    className="w-full rounded-xl border border-white/10 bg-[#07111c] px-3 py-2 text-sm text-slate-100 outline-none focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/15"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-600">
+                <label className="mb-1 block text-xs font-medium text-slate-400">
                   Category name (optional)
                 </label>
                 <input
                   value={categoryName}
                   onChange={(e) => setCategoryName(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-xl border border-white/10 bg-[#07111c] px-3 py-2 text-sm text-slate-100 outline-none focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/15"
                 />
               </div>
 
@@ -297,23 +297,23 @@ export function SearchPage() {
               <button
                 type="submit"
                 disabled={busy}
-                className="w-full rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-700 disabled:opacity-50"
+                className="w-full rounded-xl bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-[#07111c] hover:bg-cyan-300 disabled:opacity-50"
               >
                 {loading ? "Running pipeline…" : "Run automated pipeline"}
               </button>
 
               {error && (
-                <p className="text-sm text-red-600" role="alert">
+                <p className="text-sm text-red-300" role="alert">
                   {error}
                 </p>
               )}
               {message && (
                 <div className="space-y-2">
-                  <p className="text-sm text-emerald-700">{message}</p>
+                  <p className="text-sm text-emerald-300">{message}</p>
                   {lastCategoryId && (
                     <Link
                       href={`/leads?categoryId=${encodeURIComponent(lastCategoryId)}`}
-                      className="text-sm font-medium text-violet-600 hover:underline"
+                      className="text-sm font-medium text-cyan-300 hover:text-cyan-200 hover:underline"
                     >
                       View leads from this search →
                     </Link>
@@ -324,38 +324,42 @@ export function SearchPage() {
           </SpotlightCard>
         </div>
 
-        <SpotlightCard
-          title="Automation log"
-          subtitle="Scrape → OpenRouter → save"
-          className="flex min-h-[560px] flex-col"
-        >
-          {loading && (
-            <div className="mb-3 h-1 overflow-hidden rounded-full bg-slate-100">
-              <div className="log-progress h-full w-1/3 rounded-full bg-violet-500" />
-            </div>
-          )}
-          <ul className="max-h-[520px] flex-1 overflow-y-auto font-mono text-xs leading-relaxed">
-            {progress.length === 0 && (
-              <li className="text-slate-500">No activity yet — use the assistant or run the form.</li>
+        <div className="space-y-4">
+          <PipelineStatusAnimation phase={visualPhase} />
+          <SpotlightCard
+            title="Automation log"
+            subtitle="Scrape → OpenRouter → save"
+            variant="cyber"
+            className="flex min-h-[360px] flex-col"
+          >
+            {loading && (
+              <div className="mb-3 h-1 overflow-hidden rounded-full bg-white/10">
+                <div className="log-progress h-full w-1/3 rounded-full bg-cyan-300" />
+              </div>
             )}
-            {progress.map((line) => (
-              <li
-                key={line.id}
-                className={
-                  line.tone === "ok"
-                    ? "text-emerald-700"
-                    : line.tone === "skip"
-                      ? "text-slate-500"
-                      : line.tone === "err"
-                        ? "text-red-600"
-                        : "text-slate-700"
-                }
-              >
-                {line.text}
-              </li>
-            ))}
-          </ul>
-        </SpotlightCard>
+            <ul className="max-h-[520px] flex-1 overflow-y-auto font-mono text-xs leading-relaxed">
+              {progress.length === 0 && (
+                <li className="text-slate-500">No activity yet — use the assistant or run the form.</li>
+              )}
+              {progress.map((line) => (
+                <li
+                  key={line.id}
+                  className={
+                    line.tone === "ok"
+                      ? "text-emerald-300"
+                      : line.tone === "skip"
+                        ? "text-slate-500"
+                        : line.tone === "err"
+                          ? "text-red-300"
+                          : "text-slate-300"
+                  }
+                >
+                  {line.text}
+                </li>
+              ))}
+            </ul>
+          </SpotlightCard>
+        </div>
       </div>
     </div>
   );

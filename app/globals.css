@@ -143,3 +143,51 @@ body {
 .chat-dot-3 {
   animation-delay: 0.3s;
 }
+
+@keyframes radar-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes radar-contact {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.82);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+}
+
+.radar-sweep {
+  background: conic-gradient(
+    from -25deg,
+    transparent 0deg,
+    rgba(57, 230, 230, 0.015) 295deg,
+    rgba(57, 230, 230, 0.42) 350deg,
+    rgba(57, 230, 230, 0.02) 360deg
+  );
+  animation: radar-rotate 9s linear infinite;
+}
+
+.radar-contact {
+  animation: radar-contact 2.8s ease-in-out infinite;
+}
+
+.radar-contact-delay {
+  animation-delay: 0.85s;
+}
+
+.radar-contact-delay-long {
+  animation-delay: 1.6s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .radar-sweep,
+  .radar-contact {
+    animation: none;
+  }
+}

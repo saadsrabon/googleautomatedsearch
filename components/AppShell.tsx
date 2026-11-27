@@ -92,6 +92,7 @@ function ChevronIcon({ collapsed }: { collapsed: boolean }) {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const searchRoute = pathname === "/search";
   const [collapsed, setCollapsed] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -285,7 +286,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             mounted && "transition-opacity duration-300"
           )}
         >
-          <div className="cyber-content-panel mx-auto min-h-[calc(100vh-4rem)] rounded-2xl border border-white/10 bg-slate-50/95 p-4 text-slate-900 shadow-[0_0_60px_rgba(0,0,0,0.45)] backdrop-blur-sm lg:p-8">
+          <div
+            className={cn(
+              "cyber-content-panel mx-auto min-h-[calc(100vh-4rem)] rounded-2xl border p-4 shadow-[0_0_60px_rgba(0,0,0,0.45)] backdrop-blur-sm lg:p-8",
+              searchRoute
+                ? "border-cyan-500/20 bg-[#07111c]/95 text-slate-100"
+                : "border-white/10 bg-slate-50/95 text-slate-900"
+            )}
+          >
             {children}
           </div>
         </main>
